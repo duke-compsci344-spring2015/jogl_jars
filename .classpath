@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="jar/gluegen-rt.jar" sourcepath="gluegen-java-src.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/jogl_jars/gluegen-javadoc.zip!/"/>
@@ -11,4 +12,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
