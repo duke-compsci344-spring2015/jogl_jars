@@ -17,6 +17,9 @@ import com.jogamp.opengl.util.gl2.GLUT;
  * to be written. It calls your scene methods at the appropriate time.
  *
  * It may be updated from time to time to add functionality.
+ * 
+ * Based on this excellent tutorial:
+ *   https://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
  *
  * @author Robert C. Duvall
  */
@@ -100,9 +103,10 @@ public class Listener implements GLEventListener, KeyListener {
         // clear the drawing surface
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         // display model
-        gl.glPushMatrix();
-        myScene.setCamera(gl, glu, glut);
-        myScene.display(gl, glu, glut);
+        gl.glPushMatrix(); {
+            myScene.setCamera(gl, glu, glut);
+            myScene.display(gl, glu, glut);
+        }
         gl.glPopMatrix();
         // display frame rate
         computeFPS();
@@ -155,12 +159,12 @@ public class Listener implements GLEventListener, KeyListener {
     @Override
     public void keyReleased (KeyEvent e) {
         switch (e.getKeyCode()) {
-        // toggle animation running
-        case KeyEvent.VK_Z:
+          // toggle animation running
+          case KeyEvent.VK_Z:
             showFPS = !showFPS;
             break;
-            // toggle animation running
-        case KeyEvent.VK_P:
+          // toggle animation running
+          case KeyEvent.VK_P:
             isRunning = !isRunning;
             if (isRunning) {
                 myAnimator.start();
@@ -168,14 +172,14 @@ public class Listener implements GLEventListener, KeyListener {
                 myAnimator.stop();
             }
             break;
-            // quit the program
-        case KeyEvent.VK_ESCAPE:
-        case KeyEvent.VK_Q:
+          // quit the program
+          case KeyEvent.VK_ESCAPE:
+          case KeyEvent.VK_Q:
             myAnimator.stop();
             System.exit(0);
             break;
-            // pass event onto user's code
-        default:
+          // pass event onto user's code
+          default:
             myScene.keyReleased(e.getKeyCode());
         }
     }

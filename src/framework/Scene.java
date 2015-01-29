@@ -2,6 +2,7 @@ package framework;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
+
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
@@ -12,12 +13,35 @@ import com.jogamp.opengl.util.gl2.GLUT;
  * @author Robert C. Duvall
  */
 public abstract class Scene {
+    // title of the scene
+    private String myTitle;
+
+    /**
+     * Create scene with the given title.
+     *
+     * @param title displayed on the top of the Window
+     */
+    public Scene () {
+        myTitle = getClass().getSimpleName();
+    }
+
+    /**
+     * Create scene with the given title.
+     *
+     * @param title displayed on the top of the Window
+     */
+    public Scene (String title) {
+        myTitle = title;
+    }
+
     /**
      * Get the title of the scene.
      *
      * @return title of scene
      */
-    public abstract String getTitle ();
+    public String getTitle () {
+        return myTitle;
+    }
 
     /**
      * Initialize global OpenGL state.

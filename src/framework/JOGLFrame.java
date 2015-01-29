@@ -50,6 +50,9 @@ public class JOGLFrame extends JFrame {
             }
         });
         frame.getContentPane().add(canvas);
+        // set to full screen mode
+        //frame.setUndecorated(true);
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.pack();
         frame.setVisible(true);
         // start thread to drive animation
