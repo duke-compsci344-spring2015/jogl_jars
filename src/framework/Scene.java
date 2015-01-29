@@ -79,6 +79,19 @@ public abstract class Scene {
     public abstract void setCamera (GL2 gl, GLU glu, GLUT glut);
 
     /**
+     * Establish the lights in the scene.
+     * 
+     * Note, there can only be 8 lights in addition to the ambient light.
+     * 
+     * @param gl basic interface to OpenGL
+     * @param glu basic interface to GLU
+     * @param glut basic interface to GLUT
+     */
+    public void setLighting (GL2 gl, GLU glu, GLUT glut) {
+        // by default, do nothing
+    }
+
+    /**
      * Animate scene by making small changes to its state.
      *
      * For example, changing the absolute position or rotation angle of an object.

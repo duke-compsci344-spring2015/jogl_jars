@@ -105,6 +105,7 @@ public class Listener implements GLEventListener, KeyListener {
         // display model
         gl.glPushMatrix(); {
             myScene.setCamera(gl, glu, glut);
+            myScene.setLighting(gl, glu, glut);
             myScene.display(gl, glu, glut);
         }
         gl.glPopMatrix();

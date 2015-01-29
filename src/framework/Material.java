@@ -1,8 +1,7 @@
 package framework;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.fixedfunc.GLLightingFunc;
+import com.jogamp.common.nio.Buffers;
 
 
 /**
@@ -109,9 +108,16 @@ public enum Material {
      * Set the material properties of an object.
      */
     public void set (GL2 gl) {
-        gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_AMBIENT, ambient, 0);
-        gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_DIFFUSE, diffuse, 0);
-        gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_SPECULAR, specular, 0);
-        gl.glMaterialf(GL.GL_FRONT_AND_BACK, GLLightingFunc.GL_SHININESS, shininess);
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, ambient, 0);
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, diffuse, 0);
+        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
+        gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shininess);
+    }
+
+    /**
+     * Set the material properties of an object as a simple color (e.g., if no light).
+     */
+    public void setAsColor (GL2 gl) {
+        gl.glColor4fv(Buffers.newDirectFloatBuffer(diffuse));
     }
 }
