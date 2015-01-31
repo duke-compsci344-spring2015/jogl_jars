@@ -1,14 +1,15 @@
 package framework;
 
+import java.awt.Point;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
-
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**
- * A class that highlights the most useful methods for you to write to create an OpenGL scene. You
- * should subclass this to do your actual work.
+ * A class that highlights the most useful methods for you to write to create an OpenGL scene.
+ * 
+ * You should subclass this to do your actual work.
  *
  * @author Robert C. Duvall
  */
@@ -105,6 +106,13 @@ public abstract class Scene {
     }
 
     /**
+     * Called when the mouse is pressed within the canvas and it hits something.
+     */
+    public void selectObject (GL2 gl, GLU glu, GLUT glut, int numSelected, int[] selectInfo) {
+        // by default, do nothing
+    }
+
+    /**
      * Respond to the press of a key.
      *
      * @param keyCode Java code representing pressed key
@@ -128,6 +136,55 @@ public abstract class Scene {
      * @param key text representing typed key
      */
     public void keyTyped (int keyCode) {
+        // by default, do nothing
+    }
+
+    /**
+     * Respond to the press and release of the mouse.
+     *
+     * @param pt current position of the mouse
+     * @param button mouse button that was clicked
+     */
+    public void mouseClicked (Point pt, int button) {
+        // by default, do nothing
+    }
+
+    /**
+     * Respond to the press of the mouse.
+     *
+     * @param pt current position of the mouse
+     * @param button mouse button that was pressed
+     */
+    public void mousePressed (Point pt, int button) {
+        // by default, do nothing
+    }
+
+    /**
+     * Respond to the release of the mouse.
+     *
+     * @param pt current position of the mouse
+     * @param button mouse button that was released
+     */
+    public void mouseReleased (Point pt, int button) {
+        // by default, do nothing
+    }
+
+    /**
+     * Respond to the mouse being moved while the button is pressed.
+     *
+     * @param pt current position of the mouse
+     * @param button mouse button that is being held down
+     */
+    public void mouseDragged (Point pt, int button) {
+        // by default, do nothing
+    }
+
+    /**
+     * Respond to the mouse being moved in the canvas.
+     *
+     * @param pt current position of the mouse
+     */
+    public void mouseMoved (Point pt) {
         // by default, do nothing
     }
 }

@@ -1,15 +1,19 @@
 package framework;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import javax.media.opengl.GL;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.nio.IntBuffer;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.gl2.GLUT;
+import com.jogamp.common.nio.Buffers;
 
 
 /**
@@ -23,7 +27,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
  *
  * @author Robert C. Duvall
  */
-public class Listener implements GLEventListener, KeyListener {
+public class Listener implements GLEventListener, KeyListener, MouseListener {
     // constants
     public static long ONE_SECOND = 1000;
 
@@ -36,6 +40,10 @@ public class Listener implements GLEventListener, KeyListener {
     private double myFPS;
     private boolean isRunning;
     private boolean showFPS;
+    // interaction state
+    private Point myMousePoint;
+    private Dimension mySize;
+    private float myPixelFactor;
     // cache creation of these objects
     private static GLU glu = new GLU();
     private static GLUT glut = new GLUT();
@@ -47,7 +55,7 @@ public class Listener implements GLEventListener, KeyListener {
      * @param args command-line arguments
      * @param animator animation thread
      */
-    public Listener (Scene scene, AnimatorBase animator) {
+    public Listener (Scene scene, AnimatorBase animator, Dimension size) {
         myScene = scene;
         myAnimator = animator;
         isRunning = true;
@@ -55,6 +63,8 @@ public class Listener implements GLEventListener, KeyListener {
         myLastFrameTime = System.currentTimeMillis();
         myFPS = 0;
         showFPS = false;
+        mySize = size;
+        myPixelFactor = 1;
     }
 
     /**
@@ -77,11 +87,13 @@ public class Listener implements GLEventListener, KeyListener {
     public void init (GLAutoDrawable drawable) {
         // get graphics context
         GL2 gl = drawable.getGL().getGL2();
+        // is this a hi-res screen?
+        myPixelFactor = (float)mySize.width / drawable.getSurfaceWidth();
         // interesting?
         System.err.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
-        System.err.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
-        System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
-        System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
+        System.err.println("GL_VENDOR: " + gl.glGetString(GL2.GL_VENDOR));
+        System.err.println("GL_RENDERER: " + gl.glGetString(GL2.GL_RENDERER));
+        System.err.println("GL_VERSION: " + gl.glGetString(GL2.GL_VERSION));
         System.err.println("GL_CLASS: " + gl.getClass().getName());
         // set to draw in window based on depth
         gl.glEnable(GL2.GL_DEPTH_TEST);
@@ -98,6 +110,11 @@ public class Listener implements GLEventListener, KeyListener {
     public void display (GLAutoDrawable drawable) {
         // get graphics context
         GL2 gl = drawable.getGL().getGL2();
+        // check for interaction
+        if (myMousePoint != null) {
+            selectObject(gl, glu, glut, myMousePoint);
+            myMousePoint = null;
+        }
         // update scene for this time step
         myScene.animate(gl, glu, glut);
         // clear the drawing surface
@@ -120,6 +137,7 @@ public class Listener implements GLEventListener, KeyListener {
      */
     @Override
     public void reshape (GLAutoDrawable drawable, int x, int y, int width, int height) {
+        mySize.setSize((int)(width * myPixelFactor), (int)(height * myPixelFactor));
         // reset camera based on new viewport
         setPerspective(drawable.getGL().getGL2(), glu, GL2.GL_RENDER, null);
     }
@@ -194,6 +212,33 @@ public class Listener implements GLEventListener, KeyListener {
     }
 
     // //////////////////////////////////////////////////////////
+    // MouseListener methods
+    @Override
+    public void mouseClicked (MouseEvent e) {
+        myMousePoint = e.getPoint();
+    }
+
+    @Override
+    public void mouseEntered (MouseEvent e) {
+        // by default, do nothing
+    }
+
+    @Override
+    public void mouseExited (MouseEvent e) {
+        // by default, do nothing
+    }
+
+    @Override
+    public void mousePressed (MouseEvent e) {
+        // by default, do nothing
+    }
+
+    @Override
+    public void mouseReleased (MouseEvent e) {
+        // by default, do nothing
+    }
+
+    // //////////////////////////////////////////////////////////
     // helper methods
     /**
      * Reset perspective matrix based on size of viewport.
@@ -202,19 +247,52 @@ public class Listener implements GLEventListener, KeyListener {
         // get info about viewport (x, y, w, h)
         int[] viewport = new int[4];
         gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+        // scale for hi-res displays
+        viewport[2] = (int)(viewport[2] * myPixelFactor);
+        viewport[3] = (int)(viewport[3] * myPixelFactor);
         // set camera to view viewport area
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         // check for selection
         if (mode == GL2.GL_SELECT) {
             // create 5x5 pixel picking region near cursor location
-            glu.gluPickMatrix(pt.x, viewport[3] - pt.y, 5.0, 5.0, viewport, 0);
+            glu.gluPickMatrix(pt.x, viewport[3]-pt.y, 5.0f, 5.0f, viewport, 0);
         }
         // view scene in perspective
-        glu.gluPerspective(45.0, (float)viewport[2]/viewport[3], 0.1, 500.0);
+        glu.gluPerspective(45.0f, (float)viewport[2]/viewport[3], 0.1f, 500.0f);
         // prepare to work with model again
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
+    }
+
+    /**
+     * Determine which objects have been selected by pressing the mouse
+     */
+    private void selectObject (GL2 gl, GLU glu, GLUT glut, Point mousePt) {
+        final int BUFFER_SIZE = 256;
+        IntBuffer selectionBuffer = Buffers.newDirectIntBuffer(BUFFER_SIZE);
+        gl.glSelectBuffer(selectionBuffer.capacity(), selectionBuffer);
+        // prepare for selection by initializing name info (0 represents a miss)
+        gl.glRenderMode(GL2.GL_SELECT);
+        gl.glInitNames();
+        gl.glPushName(0);
+        // render to select buffer instead of color buffer
+        gl.glPushMatrix(); {
+            setPerspective(gl, glu, GL2.GL_SELECT, mousePt);
+            myScene.setCamera(gl, glu, glut);
+            myScene.display(gl, glu, glut);
+        }
+        gl.glPopMatrix();
+
+        // if object hit, react
+        int numHits = gl.glRenderMode(GL2.GL_RENDER);
+        if (numHits > 0) {
+            int[] buffer = new int[BUFFER_SIZE];
+            selectionBuffer.get(buffer);
+            myScene.selectObject(gl, glu, glut, numHits, buffer);
+        }
+        // reset camera for viewing
+        setPerspective(gl, glu, GL2.GL_RENDER, null);
     }
 
     /*

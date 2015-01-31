@@ -3,12 +3,10 @@ package framework;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLJPanel;
 import javax.swing.JFrame;
-
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -36,10 +34,11 @@ public class JOGLFrame extends JFrame {
         // these should remain pretty much fixed for all applications
         GLJPanel canvas = new GLJPanel(caps);
         final AnimatorBase animator = new FPSAnimator(canvas, FPS);
-        Listener listener = new Listener(scene, animator);
+        Listener listener = new Listener(scene, animator, size);
         // manage OpenGL canvas
         canvas.addGLEventListener(listener);
         canvas.addKeyListener(listener);
+        canvas.addMouseListener(listener);
         canvas.setPreferredSize(size);
         // create titled window to view animation
         JFrame frame = new JFrame(listener.getTitle());
