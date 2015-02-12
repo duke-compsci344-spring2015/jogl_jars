@@ -39,6 +39,7 @@ public class JOGLFrame extends JFrame {
         canvas.addGLEventListener(listener);
         canvas.addKeyListener(listener);
         canvas.addMouseListener(listener);
+        canvas.addMouseMotionListener(listener);
         canvas.setPreferredSize(size);
         // create titled window to view animation
         JFrame frame = new JFrame(listener.getTitle());

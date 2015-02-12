@@ -1,8 +1,11 @@
 package framework;
 
+import java.awt.Dimension;
 import java.awt.Point;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
+
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
@@ -15,7 +18,9 @@ import com.jogamp.opengl.util.gl2.GLUT;
  */
 public abstract class Scene {
     // title of the scene
-    private String myTitle;
+    private String myTitle = "";
+    private Dimension mySize = new Dimension();
+
 
     /**
      * Create scene with the given title.
@@ -33,15 +38,6 @@ public abstract class Scene {
      */
     public Scene (String title) {
         myTitle = title;
-    }
-
-    /**
-     * Get the title of the scene.
-     *
-     * @return title of scene
-     */
-    public String getTitle () {
-        return myTitle;
     }
 
     /**
@@ -103,6 +99,24 @@ public abstract class Scene {
      */
     public void animate (GL2 gl, GLU glu, GLUT glut) {
         // by default, do nothing
+    }
+
+    /**
+     * Get the title of the scene.
+     *
+     * @return title of scene
+     */
+    public String getTitle () {
+        return myTitle;
+    }
+
+    /**
+     * Get the size of the scene's window.
+     *
+     * @return size of scene's window
+     */
+    public Dimension getWindowSize () {
+        return mySize;
     }
 
     /**
@@ -186,5 +200,12 @@ public abstract class Scene {
      */
     public void mouseMoved (Point pt) {
         // by default, do nothing
+    }
+
+    /**
+     * Set the size of the scene's window.
+     */
+    void setWindowSize (int width, int height) {
+        mySize.setSize(width, height);
     }
 }

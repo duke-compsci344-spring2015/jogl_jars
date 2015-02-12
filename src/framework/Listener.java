@@ -6,11 +6,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.nio.IntBuffer;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.common.nio.Buffers;
@@ -27,7 +30,7 @@ import com.jogamp.common.nio.Buffers;
  *
  * @author Robert C. Duvall
  */
-public class Listener implements GLEventListener, KeyListener, MouseListener {
+public class Listener implements GLEventListener, KeyListener, MouseListener, MouseMotionListener {
     // constants
     public static long ONE_SECOND = 1000;
 
@@ -42,7 +45,6 @@ public class Listener implements GLEventListener, KeyListener, MouseListener {
     private boolean showFPS;
     // interaction state
     private Point myMousePoint;
-    private Dimension mySize;
     private float myPixelFactor;
     // cache creation of these objects
     private static GLU glu = new GLU();
@@ -57,13 +59,13 @@ public class Listener implements GLEventListener, KeyListener, MouseListener {
      */
     public Listener (Scene scene, AnimatorBase animator, Dimension size) {
         myScene = scene;
+        myScene.setWindowSize(size.width, size.height);
         myAnimator = animator;
         isRunning = true;
         myFrameCount = 0;
         myLastFrameTime = System.currentTimeMillis();
         myFPS = 0;
         showFPS = false;
-        mySize = size;
         myPixelFactor = 1;
     }
 
@@ -88,7 +90,7 @@ public class Listener implements GLEventListener, KeyListener, MouseListener {
         // get graphics context
         GL2 gl = drawable.getGL().getGL2();
         // is this a hi-res screen?
-        myPixelFactor = (float)mySize.width / drawable.getSurfaceWidth();
+        myPixelFactor = (float)myScene.getWindowSize().width / drawable.getSurfaceWidth();
         // interesting?
         System.err.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
         System.err.println("GL_VENDOR: " + gl.glGetString(GL2.GL_VENDOR));
@@ -137,7 +139,7 @@ public class Listener implements GLEventListener, KeyListener, MouseListener {
      */
     @Override
     public void reshape (GLAutoDrawable drawable, int x, int y, int width, int height) {
-        mySize.setSize((int)(width * myPixelFactor), (int)(height * myPixelFactor));
+        myScene.setWindowSize((int)(width * myPixelFactor), (int)(height * myPixelFactor));
         // reset camera based on new viewport
         setPerspective(drawable.getGL().getGL2(), glu, GL2.GL_RENDER, null);
     }
@@ -230,12 +232,22 @@ public class Listener implements GLEventListener, KeyListener, MouseListener {
 
     @Override
     public void mousePressed (MouseEvent e) {
-        // by default, do nothing
+        myScene.mousePressed(e.getPoint(), e.getButton());
     }
 
     @Override
     public void mouseReleased (MouseEvent e) {
-        // by default, do nothing
+        myScene.mouseReleased(e.getPoint(), e.getButton());
+    }
+
+    @Override
+    public void mouseDragged (MouseEvent e) {
+        myScene.mouseDragged(e.getPoint(), e.getButton());
+    }
+
+    @Override
+    public void mouseMoved (MouseEvent e) {
+        myScene.mouseMoved(e.getPoint());
     }
 
     // //////////////////////////////////////////////////////////
