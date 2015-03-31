@@ -31,6 +31,8 @@ public class JOGLFrame extends JFrame {
         // create OpenGL classes
         // if you need something specific to your platform, add it here
         GLCapabilities caps = new GLCapabilities(GLProfile.getDefault());
+        // let stencil buffer know the pixel format 
+        caps.setStencilBits(8);
         // these should remain pretty much fixed for all applications
         GLJPanel canvas = new GLJPanel(caps);
         final AnimatorBase animator = new FPSAnimator(canvas, FPS);
