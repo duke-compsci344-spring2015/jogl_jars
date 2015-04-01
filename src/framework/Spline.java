@@ -124,6 +124,31 @@ public class Spline implements Iterable<float[]> {
     }
 
     /**
+     * Evaluate the second derivative of the curve at a given time.
+     * 
+     * Note, t varies from [0 .. 1] across a set of 4 control points and 
+     * each set of 4 control points influences the curve within them. 
+     * Thus a time value between [0 .. 1] generates a derivative within the 
+     * first 4 control points and a value between [n-2 .. n-1] generates a
+     * derivative within the last 4 control points.
+     * 
+     * A time value outside the range [0 .. n] is wrapped, modded, so it 
+     * falls within the appropriate range.
+     */
+    public float[] evaluateSecondDerivativeAt (float t) {
+        int tn = (int)Math.floor(t);
+        float u = t - tn;
+        // evaluate basis functions at t, faster than matrix multiply
+        float[] basis = {
+            -6*u + 6,
+             18*u - 12,
+            -18*u + 6,
+             6*u
+        };
+        return evaluateBasisAt(tn, basis);
+    }
+
+    /**
      * Returns total number of control points around the curve.
      */
     public int numControlPoints () {
