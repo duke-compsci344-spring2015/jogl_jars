@@ -24,6 +24,13 @@ public class Spline implements Iterable<float[]> {
     /**
      * Create empty curve.
      */
+    public Spline () {
+        // do nothing
+    }
+
+    /**
+     * Create curve from the given control points.
+     */
     public Spline (float[] controlPoints) {
         // BUGBUG: check that it is a multiple of 3
         for (int k = 0; k < controlPoints.length; k += 3) {
